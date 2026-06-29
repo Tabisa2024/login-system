@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Assistant</title>
+  <title>Tabisa's AI Assistant</title>
+
   <style>
     body {
       font-family: Arial;
@@ -47,7 +48,7 @@
     }
 
     input {
-      width: 70%;
+      width: 65%;
       padding: 10px;
     }
 
@@ -56,13 +57,18 @@
       background: #38bdf8;
       border: none;
       cursor: pointer;
+      margin: 5px;
+    }
+
+    .quick-buttons {
+      margin-top: 10px;
     }
   </style>
 </head>
 
 <body>
 
-<h1>Tabisa AI Assistant 🤖</h1>
+<h1>Tabisa's AI Assistant 🤖</h1>
 <p>Ask about reports, automation, or system status</p>
 
 <div class="chat-container">
@@ -70,59 +76,97 @@
 
   <input type="text" id="userInput" placeholder="Ask something...">
   <button onclick="sendMessage()">Send</button>
+
+  <div class="quick-buttons">
+    <button onclick="quickAsk('Generate HR report')">Generate Report</button>
+    <button onclick="quickAsk('Check system status')">System Status</button>
+    <button onclick="quickAsk('Run automation')">Run Automation</button>
+    <button onclick="clearChat()">Clear Chat</button>
+  </div>
 </div>
 
 <button onclick="logout()">Logout</button>
 
 <script>
 
-// Check login
+// ✅ Check login
 if(localStorage.getItem("loggedIn") !== "true") {
   window.location.href = "index.html";
 }
 
-// Logout
-function logout() {
-  localStorage.removeItem("loggedIn");
-  window.location.href = "index.html";
-}
+//  Load saved chat
+window.onload = function() {
+  let savedChat = localStorage.getItem("chatHistory");
+  if (savedChat) {
+    document.getElementById("chat").innerHTML = savedChat;
+  }
+};
 
-// Chat logic
+// Send message
 function sendMessage() {
   let input = document.getElementById("userInput");
   let chat = document.getElementById("chat");
 
   let userText = input.value;
-
   if(userText === "") return;
 
-  chat.innerHTML += `<div class="user">${userText}</div>`;
+  let userMsg = `<div class="user">${userText}</div>`;
+  chat.innerHTML += userMsg;
 
   let response = "";
 
   if(userText.toLowerCase().includes("report")) {
-    response = "✅ HR reports generated successfully.";
+    response = "✅ Your HR report has been generated and is ready for review.";
   } 
   else if(userText.toLowerCase().includes("automation")) {
-    response = "⚙️ Automation is running smoothly.";
+    response = "⚙️ Automation completed successfully. All workflows executed.";
   }
   else if(userText.toLowerCase().includes("status")) {
-    response = "✅ System is active and healthy.";
+    response = "✅ System is fully operational with no issues detected.";
   } 
   else {
-    response = "🤖 I'm your AI assistant. Try asking about reports or automation.";
+    response = "🤖 I can assist with HR automation, reporting, and system monitoring.";
   }
 
   setTimeout(() => {
-    chat.innerHTML += `<div class="bot">${response}</div>`;
+    let botMsg = `<div class="bot">${response}</div>`;
+    chat.innerHTML += botMsg;
+
+    //  Save chat
+    localStorage.setItem("chatHistory", chat.innerHTML);
+
     chat.scrollTop = chat.scrollHeight;
   }, 500);
 
   input.value = "";
 }
 
+// Quick buttons
+function quickAsk(text) {
+  document.getElementById("userInput").value = text;
+  sendMessage();
+}
+
+//  Clear chat
+function clearChat() {
+  localStorage.removeItem("chatHistory");
+  document.getElementById("chat").innerHTML = "";
+}
+
+//  Logout
+function logout() {
+  localStorage.removeItem("loggedIn");
+  window.location.href = "index.html";
+}
+
+//  Enter key support
+document.getElementById("userInput").addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    sendMessage();
+  }
+});
+
 </script>
 
 </body>
 </html>
-``
