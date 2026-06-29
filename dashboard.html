@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Dashboard</title>
+  <title>AI Assistant</title>
   <style>
     body {
       font-family: Arial;
@@ -30,19 +30,20 @@
       margin-bottom: 10px;
     }
 
-    .user, .bot {
+    .user {
+      background: #38bdf8;
       padding: 8px;
       margin: 5px 0;
       border-radius: 5px;
-    }
-
-    .user {
-      background: #38bdf8;
       text-align: right;
     }
 
     .bot {
       background: #334155;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      text-align: left;
     }
 
     input {
@@ -56,17 +57,13 @@
       border: none;
       cursor: pointer;
     }
-
-    .top-buttons {
-      margin-top: 10px;
-    }
   </style>
 </head>
 
 <body>
 
 <h1>Tabisa AI Assistant 🤖</h1>
-<p>Ask anything about HR, reports, or automation</p>
+<p>Ask about reports, automation, or system status</p>
 
 <div class="chat-container">
   <div class="messages" id="chat"></div>
@@ -75,21 +72,22 @@
   <button onclick="sendMessage()">Send</button>
 </div>
 
-<div class="top-buttons">
-  <button onclick="logout()">Logout</button>
-</div>
+<button onclick="logout()">Logout</button>
 
 <script>
 
+// Check login
 if(localStorage.getItem("loggedIn") !== "true") {
   window.location.href = "index.html";
 }
 
+// Logout
 function logout() {
   localStorage.removeItem("loggedIn");
   window.location.href = "index.html";
 }
 
+// Chat logic
 function sendMessage() {
   let input = document.getElementById("userInput");
   let chat = document.getElementById("chat");
@@ -98,20 +96,18 @@ function sendMessage() {
 
   if(userText === "") return;
 
- 
   chat.innerHTML += `<div class="user">${userText}</div>`;
 
-  
   let response = "";
 
   if(userText.toLowerCase().includes("report")) {
-    response = "✅ Latest HR report generated successfully.";
+    response = "✅ HR reports generated successfully.";
   } 
   else if(userText.toLowerCase().includes("automation")) {
-    response = "⚙️ Automation process is running smoothly.";
+    response = "⚙️ Automation is running smoothly.";
   }
   else if(userText.toLowerCase().includes("status")) {
-    response = "✅ All systems are operational.";
+    response = "✅ System is active and healthy.";
   } 
   else {
     response = "🤖 I'm your AI assistant. Try asking about reports or automation.";
@@ -129,3 +125,4 @@ function sendMessage() {
 
 </body>
 </html>
+``
