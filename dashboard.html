@@ -37,19 +37,21 @@
     .messages {
       height: 320px;
       overflow-y: auto;
-      text-align: left;
-      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
       padding: 10px;
-      border-radius: 10px;
       background: #0f172a;
+      border-radius: 10px;
     }
 
     .user {
       background: #38bdf8;
       color: white;
       padding: 10px;
-      margin: 8px 0;
-      border-radius: 8px;
+      border-radius: 10px;
+      align-self: flex-end;
+      max-width: 75%;
       text-align: right;
     }
 
@@ -57,8 +59,9 @@
       background: #334155;
       color: white;
       padding: 10px;
-      margin: 8px 0;
-      border-radius: 8px;
+      border-radius: 10px;
+      align-self: flex-start;
+      max-width: 75%;
       text-align: left;
     }
 
@@ -114,300 +117,315 @@
       background: #ef4444;
       color: white;
     }
+
+    .logout-btn:hover {
+      background: #dc2626;
+    }
   </style>
 </head>
 
 <body>
 
-<h1>Tabisa's AI Assistant 🤖</h1>
-<p>Ask about reports, automation, or system status</p>
+  <h1>Tabisa's AI Assistant 🤖</h1>
+  <p>Ask about reports, automation, or system status</p>
 
-<div class="chat-container">
-  <div class="messages" id="chat"></div>
+  <div class="chat-container">
+    <div class="messages" id="chat"></div>
 
-  <input type="text" id="userInput" placeholder="Ask something...">
-  <button onclick="sendMessage()">Send</button>
+    <input type="text" id="userInput" placeholder="Ask something...">
+    <button onclick="sendMessage()">Send</button>
 
-  <div class="quick-buttons">
-    <button onclick="quickAsk('Hello')">Say Hello</button>
-    <button onclick="quickAsk('Generate HR report')">Generate Report</button>
-    <button onclick="quickAsk('Check system status')">System Status</button>
-    <button onclick="quickAsk('Run automation')">Run Automation</button>
-    <button onclick="quickAsk('Log error')">Log Error</button>
-    <button onclick="clearChat()">Clear Chat</button>
+    <div class="quick-buttons">
+      <button onclick="quickAsk('Hello')">Say Hello</button>
+      <button onclick="quickAsk('Generate HR report')">Generate Report</button>
+      <button onclick="quickAsk('Check system status')">System Status</button>
+      <button onclick="quickAsk('Run automation')">Run Automation</button>
+      <button onclick="quickAsk('Log error')">Log Error</button>
+      <button onclick="clearChat()">Clear Chat</button>
+    </div>
   </div>
-</div>
 
-<div class="dashboard-section">
-  <h2>📊 Automation Dashboard</h2>
-  <canvas id="myChart" width="400" height="200"></canvas>
-</div>
+  <div class="dashboard-section">
+    <h2>📊 Automation Dashboard</h2>
+    <canvas id="myChart" width="400" height="200"></canvas>
+  </div>
 
-<button class="logout-btn" onclick="logout()">Logout</button>
+  <button class="logout-btn" onclick="logout()">Logout</button>
 
-<script>
-/* =========================
-   LOGIN CHECK
-========================= */
+  <script>
+    /* =========================
+       LOGIN CHECK
+    ========================= */
 
-if(localStorage.getItem("loggedIn") !== "true") {
-  window.location.href = "index.html";
-}
+    if(localStorage.getItem("loggedIn") !== "true") {
+      window.location.href = "index.html";
+    }
 
-/* =========================
-   MEMORY VARIABLE
-========================= */
+    /* =========================
+       MEMORY VARIABLE
+    ========================= */
 
-let lastAction = "";
+    let lastAction = "";
 
-/* =========================
-   GLOBAL CHART VARIABLES
-========================= */
+    /* =========================
+       GLOBAL CHART VARIABLES
+    ========================= */
 
-let reportsCount = Number(localStorage.getItem("reportsCount")) || 12;
-let automationsCount = Number(localStorage.getItem("automationsCount")) || 8;
-let errorsCount = Number(localStorage.getItem("errorsCount")) || 2;
-let myChart;
+    let reportsCount = Number(localStorage.getItem("reportsCount")) || 12;
+    let automationsCount = Number(localStorage.getItem("automationsCount")) || 8;
+    let errorsCount = Number(localStorage.getItem("errorsCount")) || 2;
+    let myChart;
 
-/* =========================
-   PAGE LOAD
-========================= */
+    /* =========================
+       PAGE LOAD
+    ========================= */
 
-window.onload = function () {
-  loadChatHistory();
-  createChart();
-};
+    window.onload = function () {
+      loadChatHistory();
+      createChart();
+      document.getElementById("userInput").focus();
+    };
 
-/* =========================
-   LOAD SAVED CHAT
-========================= */
+    /* =========================
+       LOAD SAVED CHAT
+    ========================= */
 
-function loadChatHistory() {
-  let savedChat = localStorage.getItem("chatHistory");
+    function loadChatHistory() {
+      let savedChat = localStorage.getItem("chatHistory");
 
-  if (savedChat) {
-    document.getElementById("chat").innerHTML = savedChat;
-  }
+      if (savedChat) {
+        document.getElementById("chat").innerHTML = savedChat;
+      }
 
-  scrollChat();
-}
+      scrollChat();
+    }
 
-/* =========================
-   CREATE CHART
-========================= */
+    /* =========================
+       CREATE CHART
+    ========================= */
 
-function createChart() {
-  const ctx = document.getElementById("myChart");
+    function createChart() {
+      const ctx = document.getElementById("myChart");
 
-  myChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Reports", "Automations", "Errors"],
-      datasets: [{
-        label: "System Activity",
-        data: [reportsCount, automationsCount, errorsCount],
-        backgroundColor: ["#38bdf8", "#22c55e", "#ef4444"]
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          labels: {
-            color: "#111827"
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            color: "#111827"
-          }
+      myChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Reports", "Automations", "Errors"],
+          datasets: [{
+            label: "System Activity",
+            data: [reportsCount, automationsCount, errorsCount],
+            backgroundColor: ["#38bdf8", "#22c55e", "#ef4444"]
+          }]
         },
-        x: {
-          ticks: {
-            color: "#111827"
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              labels: {
+                color: "#111827"
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                color: "#111827"
+              }
+            },
+            x: {
+              ticks: {
+                color: "#111827"
+              }
+            }
           }
         }
+      });
+    }
+
+    /* =========================
+       UPDATE CHART
+    ========================= */
+
+    function updateChart() {
+      myChart.data.datasets[0].data = [
+        reportsCount,
+        automationsCount,
+        errorsCount
+      ];
+
+      myChart.update();
+
+      localStorage.setItem("reportsCount", reportsCount);
+      localStorage.setItem("automationsCount", automationsCount);
+      localStorage.setItem("errorsCount", errorsCount);
+    }
+
+    /* =========================
+       SEND MESSAGE
+    ========================= */
+
+    function sendMessage() {
+      let input = document.getElementById("userInput");
+      let chat = document.getElementById("chat");
+
+      let userText = input.value.trim();
+
+      if(userText === "") {
+        showTypingThenResponse("🤖 Please type a message so I can assist you.");
+        return;
+      }
+
+      let time = new Date().toLocaleTimeString();
+
+      let userMsg = `
+        <div class="user">
+          ${userText}
+          <small>${time}</small>
+        </div>
+      `;
+
+      chat.innerHTML += userMsg;
+      input.value = "";
+
+      scrollChat();
+
+      let response = getBotResponse(userText);
+
+      showTypingThenResponse(response);
+    }
+
+    /* =========================
+       BOT RESPONSE LOGIC
+    ========================= */
+
+    function getBotResponse(userText) {
+      let text = userText.toLowerCase();
+
+      // Follow-up response must come first
+      if(text.includes("yes") && lastAction === "report") {
+        lastAction = "";
+        return "📈 Summary: HR automation activity has increased, report generation is active, and overall workflow efficiency is improving.";
+      }
+
+      else if(text.includes("no") && lastAction === "report") {
+        lastAction = "";
+        return "✅ No problem. The HR report has been generated and saved on the dashboard.";
+      }
+
+      else if(text.includes("hello") || text.includes("hey") || text.includes("hi")) {
+        return "👋 Hello Tabisa! I can help you monitor HR reports, automation runs, and system status.";
+      }
+
+      else if(text.includes("report")) {
+        lastAction = "report";
+        reportsCount++;
+        updateChart();
+        return "📊 Your HR report has been generated successfully. Would you like a summary of key insights?";
+      }
+
+      else if(text.includes("automation") || text.includes("run")) {
+        automationsCount++;
+        updateChart();
+        return "⚙️ Automation completed successfully. All workflows executed without issues.";
+      }
+
+      else if(text.includes("status")) {
+        return "✅ All systems are fully operational. No issues detected.";
+      }
+
+      else if(text.includes("error")) {
+        errorsCount++;
+        updateChart();
+        return "⚠️ An error entry has been logged on the dashboard for monitoring.";
+      }
+
+      else if(text.includes("help")) {
+        return "🤖 You can ask me to generate HR reports, run automation, check system status, or log errors.";
+      }
+
+      else {
+        return "🤖 I can assist with HR automation, reporting, system monitoring, and dashboard updates.";
       }
     }
-  });
-}
 
-/* =========================
-   UPDATE CHART
-========================= */
+    /* =========================
+       TYPING EFFECT
+    ========================= */
 
-function updateChart() {
-  myChart.data.datasets[0].data = [reportsCount, automationsCount, errorsCount];
-  myChart.update();
+    function showTypingThenResponse(response) {
+      let chat = document.getElementById("chat");
+      let time = new Date().toLocaleTimeString();
 
-  localStorage.setItem("reportsCount", reportsCount);
-  localStorage.setItem("automationsCount", automationsCount);
-  localStorage.setItem("errorsCount", errorsCount);
-}
+      let typingMsg = document.createElement("div");
+      typingMsg.className = "bot";
+      typingMsg.innerHTML = "🤖 Typing...";
 
-/* =========================
-   SEND MESSAGE
-========================= */
+      chat.appendChild(typingMsg);
+      scrollChat();
 
-function sendMessage() {
-  let input = document.getElementById("userInput");
-  let chat = document.getElementById("chat");
+      setTimeout(() => {
+        typingMsg.innerHTML = `
+          ${response}
+          <small>${time}</small>
+        `;
 
-  let userText = input.value.trim();
+        localStorage.setItem("chatHistory", chat.innerHTML);
+        scrollChat();
+      }, 800);
+    }
 
-  if(userText === "") return;
+    /* =========================
+       QUICK BUTTONS
+    ========================= */
 
-  let time = new Date().toLocaleTimeString();
+    function quickAsk(text) {
+      document.getElementById("userInput").value = text;
+      sendMessage();
+    }
 
-  let userMsg = `
-    <div class="user">
-      ${userText}
-      <small>${time}</small>
-    </div>
-  `;
+    /* =========================
+       CLEAR CHAT
+    ========================= */
 
-  chat.innerHTML += userMsg;
-  input.value = "";
+    function clearChat() {
+      localStorage.removeItem("chatHistory");
+      document.getElementById("chat").innerHTML = "";
+      document.getElementById("userInput").focus();
+    }
 
-  scrollChat();
+    /* =========================
+       LOGOUT
+    ========================= */
 
-  let response = getBotResponse(userText);
+    function logout() {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "index.html";
+    }
 
-  showTypingThenResponse(response);
-}
+    /* =========================
+       SCROLL CHAT
+    ========================= */
 
-/* =========================
-   BOT RESPONSE LOGIC
-========================= */
+    function scrollChat() {
+      let chat = document.getElementById("chat");
 
-function getBotResponse(userText) {
-  let text = userText.toLowerCase();
+      chat.scrollTo({
+        top: chat.scrollHeight,
+        behavior: "smooth"
+      });
+    }
 
-  // Follow-up response must come first
-  if(text.includes("yes") && lastAction === "report") {
-    lastAction = "";
-    return "📈 Summary: HR automation activity has increased, report generation is active, and overall workflow efficiency is improving.";
-  }
+    /* =========================
+       ENTER KEY SUPPORT
+    ========================= */
 
-  else if(text.includes("no") && lastAction === "report") {
-    lastAction = "";
-    return "✅ No problem. The HR report has been generated and saved on the dashboard.";
-  }
-
-  else if(text.includes("hello") || text.includes("hey") || text.includes("hi")) {
-    return "👋 Hello Tabisa! I can help you monitor HR reports, automation runs, and system status.";
-  }
-
-  else if(text.includes("report")) {
-    lastAction = "report";
-    reportsCount++;
-    updateChart();
-    return "📊 Your HR report has been generated successfully. Would you like a summary of key insights?";
-  }
-
-  else if(text.includes("automation") || text.includes("run")) {
-    automationsCount++;
-    updateChart();
-    return "⚙️ Automation completed successfully. All workflows executed without issues.";
-  }
-
-  else if(text.includes("status")) {
-    return "✅ All systems are fully operational. No issues detected.";
-  }
-
-  else if(text.includes("error")) {
-    errorsCount++;
-    updateChart();
-    return "⚠️ An error entry has been logged on the dashboard for monitoring.";
-  }
-
-  else if(text.includes("help")) {
-    return "🤖 You can ask me to generate HR reports, run automation, check system status, or log errors.";
-  }
-
-  else {
-    return "🤖 I can assist with HR automation, reporting, system monitoring, and dashboard updates.";
-  }
-}
-
-/* =========================
-   TYPING EFFECT
-========================= */
-
-function showTypingThenResponse(response) {
-  let chat = document.getElementById("chat");
-  let time = new Date().toLocaleTimeString();
-
-  let typingMsg = document.createElement("div");
-  typingMsg.className = "bot";
-  typingMsg.innerHTML = "🤖 Typing...";
-
-  chat.appendChild(typingMsg);
-  scrollChat();
-
-  setTimeout(() => {
-    typingMsg.innerHTML = `
-      ${response}
-      <small>${time}</small>
-    `;
-
-    localStorage.setItem("chatHistory", chat.innerHTML);
-    scrollChat();
-  }, 800);
-}
-
-/* =========================
-   QUICK BUTTONS
-========================= */
-
-function quickAsk(text) {
-  document.getElementById("userInput").value = text;
-  sendMessage();
-}
-
-/* =========================
-   CLEAR CHAT
-========================= */
-
-function clearChat() {
-  localStorage.removeItem("chatHistory");
-  document.getElementById("chat").innerHTML = "";
-}
-
-/* =========================
-   LOGOUT
-========================= */
-
-function logout() {
-  localStorage.removeItem("loggedIn");
-  window.location.href = "index.html";
-}
-
-/* =========================
-   SCROLL CHAT
-========================= */
-
-function scrollChat() {
-  let chat = document.getElementById("chat");
-  chat.scrollTo({
-    top: chat.scrollHeight,
-    behavior: "smooth"
-  });
-}
-
-/* =========================
-   ENTER KEY SUPPORT
-========================= */
-
-document.getElementById("userInput").addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    sendMessage();
-  }
-});
-</script>
+    document.getElementById("userInput").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    });
+  </script>
 
 </body>
 </html>
