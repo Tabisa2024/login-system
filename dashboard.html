@@ -3,6 +3,9 @@
 <head>
   <title>Tabisa's AI Assistant</title>
 
+  <!-- ✅ Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     body {
       font-family: Arial;
@@ -60,8 +63,8 @@
       margin: 5px;
     }
 
-    .quick-buttons {
-      margin-top: 10px;
+    canvas {
+      margin-top: 30px;
     }
   </style>
 </head>
@@ -77,15 +80,17 @@
   <input type="text" id="userInput" placeholder="Ask something...">
   <button onclick="sendMessage()">Send</button>
 
-  <div class="quick-buttons">
-    <button onclick="quickAsk('Generate HR report')">Generate Report</button>
-    <button onclick="quickAsk('Check system status')">System Status</button>
-    <button onclick="quickAsk('Run automation')">Run Automation</button>
-    <button onclick="clearChat()">Clear Chat</button>
-  </div>
+  <br><br>
+  <button onclick="quickAsk('Generate HR report')">Generate Report</button>
+  <button onclick="quickAsk('Check system status')">System Status</button>
+  <button onclick="quickAsk('Run automation')">Run Automation</button>
+  <button onclick="clearChat()">Clear Chat</button>
 </div>
 
 <button onclick="logout()">Logout</button>
+
+<h2>📊 Automation Dashboard</h2>
+<canvas id="myChart" width="400" height="200"></canvas>
 
 <script>
 
@@ -94,15 +99,42 @@ if(localStorage.getItem("loggedIn") !== "true") {
   window.location.href = "index.html";
 }
 
-//  Load saved chat
-window.onload = function() {
+// ✅ Load chat + chart
+window.onload = function () {
+
   let savedChat = localStorage.getItem("chatHistory");
   if (savedChat) {
     document.getElementById("chat").innerHTML = savedChat;
   }
+
+  // ✅ Create chart
+  const ctx = document.getElementById('myChart');
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Reports', 'Automations', 'Errors'],
+      datasets: [{
+        label: 'System Activity',
+        data: [12, 8, 2],
+        backgroundColor: ['#38bdf8', '#22c55e', '#ef4444']
+      }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          labels: { color: 'white' }
+        }
+      },
+      scales: {
+        y: { ticks: { color: 'white' } },
+        x: { ticks: { color: 'white' } }
+      }
+    }
+  });
 };
 
-// Send message
+// ✅ Chat
 function sendMessage() {
   let input = document.getElementById("userInput");
   let chat = document.getElementById("chat");
@@ -110,63 +142,7 @@ function sendMessage() {
   let userText = input.value;
   if(userText === "") return;
 
-  let userMsg = `<div class="user">${userText}</div>`;
-  chat.innerHTML += userMsg;
+  chat.innerHTML += `<div class="user">${userText}</div>`;
 
   let response = "";
 
-  if(userText.toLowerCase().includes("report")) {
-    response = "✅ Your HR report has been generated and is ready for review.";
-  } 
-  else if(userText.toLowerCase().includes("automation")) {
-    response = "⚙️ Automation completed successfully. All workflows executed.";
-  }
-  else if(userText.toLowerCase().includes("status")) {
-    response = "✅ System is fully operational with no issues detected.";
-  } 
-  else {
-    response = "🤖 I can assist with HR automation, reporting, and system monitoring.";
-  }
-
-  setTimeout(() => {
-    let botMsg = `<div class="bot">${response}</div>`;
-    chat.innerHTML += botMsg;
-
-    //  Save chat
-    localStorage.setItem("chatHistory", chat.innerHTML);
-
-    chat.scrollTop = chat.scrollHeight;
-  }, 500);
-
-  input.value = "";
-}
-
-// Quick buttons
-function quickAsk(text) {
-  document.getElementById("userInput").value = text;
-  sendMessage();
-}
-
-//  Clear chat
-function clearChat() {
-  localStorage.removeItem("chatHistory");
-  document.getElementById("chat").innerHTML = "";
-}
-
-//  Logout
-function logout() {
-  localStorage.removeItem("loggedIn");
-  window.location.href = "index.html";
-}
-
-//  Enter key support
-document.getElementById("userInput").addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    sendMessage();
-  }
-});
-
-</script>
-
-</body>
-</html>
