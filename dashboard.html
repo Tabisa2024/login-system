@@ -70,13 +70,20 @@
 <button onclick="logout()">Logout</button>
 
 <script>
+
+if(localStorage.getItem("loggedIn") !== "true") {
+  window.location.href = "index.html";
+}
+
 function logout() {
+  localStorage.removeItem("loggedIn");
   window.location.href = "index.html";
 }
 
 function runAutomation() {
   alert("Automation running successfully!");
 }
+
 </script>
 
 </body>
