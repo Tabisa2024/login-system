@@ -144,6 +144,8 @@
 
 <button class="logout-btn" onclick="logout()">Logout</button>
 
+  let lastAction = "";
+
 <script>
 /* =========================
    LOGIN CHECK
@@ -290,11 +292,15 @@ function getBotResponse(userText) {
     return "👋 Hello Tabisa! I can help you monitor HR reports, automation runs, and system status.";
   }
 
-  else if(text.includes("report")) {
-    reportsCount++;
-    updateChart();
-    return "📊 Your HR report has been generated successfully. The report count has also been updated on the dashboard.";
-  }
+ else if(text.includes("report")) {
+  lastAction = "report";
+  reportsCount++;
+  updateChart();
+  return "📊 Your HR report has been generated successfully. Would you like a summary of key insights?";
+}
+else if(text.includes("yes") && lastAction === "report") {
+  return "📈 Summary: Increased automation usage and improved HR workflow efficiency detected.";
+}
 
   else if(text.includes("automation") || text.includes("run")) {
     automationsCount++;
